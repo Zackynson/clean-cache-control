@@ -8,11 +8,18 @@ class CacheStoreSpy implements CacheStore {
 
   insertCallsCount = 0;
 
-  key = '';
+  deletekey = '';
+
+  insertKey = '';
 
   delete(key: string): void {
-    this.key = key;
+    this.deletekey = key;
     this.deleteCallsCount += 1;
+  }
+
+  insert(key: string): void {
+    this.insertKey = key;
+    this.insertCallsCount += 1;
   }
 }
 
@@ -41,15 +48,26 @@ describe('LocalSavePurchases', () => {
     const { sut, cacheStore } = makeSut();
     await sut.save('purchases');
     expect(cacheStore.deleteCallsCount).toBe(1);
-    expect(cacheStore.key).toBe('purchases');
+    expect(cacheStore.deletekey).toBe('purchases');
   });
 
-  test('Should not insert if delete fails', async () => {
+  test('Should not insert if delete fails', () => {
     const { sut, cacheStore } = makeSut();
 
     jest.spyOn(cacheStore, 'delete').mockImplementationOnce(() => { throw new Error(); });
     const promise = sut.save('purchases');
     expect(cacheStore.deleteCallsCount).toBe(0);
     expect(promise).rejects.toThrow();
+  });
+
+  test('Should insert if delete succeeds', async () => {
+    const { sut, cacheStore } = makeSut();
+
+    sut.save('purchases');
+    expect(cacheStore.deleteCallsCount).toBe(1);
+    expect(cacheStore.deletekey).toBe('purchases');
+
+    expect(cacheStore.insertCallsCount).toBe(1);
+    expect(cacheStore.insertKey).toBe('purchases');
   });
 });
