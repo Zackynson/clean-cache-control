@@ -1,12 +1,15 @@
 // eslint-disable-next-line max-classes-per-file
 interface CacheStore {
-  delete: () => void
+  delete: (key: string) => void
 }
 
 class CacheStoreSpy implements CacheStore {
   deleteCallsCount = 0;
 
-  delete(): void {
+  key = '';
+
+  delete(key: string): void {
+    this.key = key;
     this.deleteCallsCount += 1;
   }
 }
@@ -16,8 +19,8 @@ class LocalSavePurchases {
     this.cacheStore = cacheStore;
   }
 
-  async save(): Promise<void> {
-    this.cacheStore.delete();
+  async save(key: string): Promise<void> {
+    this.cacheStore.delete(key);
     return Promise.resolve();
   }
 }
@@ -45,7 +48,13 @@ describe('LocalSavePurchases', () => {
 
   test('Should delete old Cache on sut.save', () => {
     const { sut, cacheStore } = makeSut();
-    sut.save();
+    sut.save('purchases');
     expect(cacheStore.deleteCallsCount).toBe(1);
+  });
+
+  test('should call delete with correct key', () => {
+    const { sut, cacheStore } = makeSut();
+    sut.save('purchases');
+    expect(cacheStore.key).toBe('purchases');
   });
 });
