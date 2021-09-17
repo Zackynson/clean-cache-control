@@ -29,6 +29,10 @@ class CacheStoreSpy implements CacheStore {
   simulateDeleteError(): void {
     jest.spyOn(CacheStoreSpy.prototype, 'delete').mockImplementationOnce(() => { throw new Error(); });
   }
+
+  simulateInsertError(): void {
+    jest.spyOn(CacheStoreSpy.prototype, 'insert').mockImplementationOnce(() => { throw new Error(); });
+  }
 }
 
 type SutTypes = {
@@ -64,7 +68,7 @@ describe('LocalSavePurchases', () => {
 
   test('Should delete old Cache on sut.save with correct key', async () => {
     const { sut, cacheStore } = makeSut();
-    await sut.save([]);
+    await sut.save(mockPurchases());
     expect(cacheStore.deleteCallsCount).toBe(1);
     expect(cacheStore.deletekey).toBe('purchases');
   });
@@ -74,7 +78,7 @@ describe('LocalSavePurchases', () => {
 
     cacheStore.simulateDeleteError();
 
-    const promise = sut.save([]);
+    const promise = sut.save(mockPurchases());
     expect(cacheStore.deleteCallsCount).toBe(0);
     expect(promise).rejects.toThrow();
   });
@@ -90,5 +94,18 @@ describe('LocalSavePurchases', () => {
     expect(cacheStore.insertCallsCount).toBe(1);
     expect(cacheStore.insertKey).toBe('purchases');
     expect(cacheStore.insertedItems).toEqual(purchases);
+  });
+
+  test('Should throw if insert throws', () => {
+    const { sut, cacheStore } = makeSut();
+
+    cacheStore.simulateInsertError();
+
+    const promise = sut.save(mockPurchases());
+    expect(cacheStore.deleteCallsCount).toBe(1);
+    expect(cacheStore.deletekey).toBe('purchases');
+
+    expect(cacheStore.insertCallsCount).toBe(0);
+    expect(promise).rejects.toThrow();
   });
 });
