@@ -1,6 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 
 import { LocalSavePurchases } from '@/data/usecases';
+import { SavePurchases } from '@/domain';
 import { CacheStore } from '@/data/protocols/cache';
 
 class CacheStoreSpy implements CacheStore {
@@ -12,14 +13,17 @@ class CacheStoreSpy implements CacheStore {
 
   insertKey = '';
 
+  insertedItems: Array<SavePurchases.Params> = [];
+
   delete(key: string): void {
     this.deletekey = key;
     this.deleteCallsCount += 1;
   }
 
-  insert(key: string): void {
+  insert(key: string, value:any): void {
     this.insertKey = key;
     this.insertCallsCount += 1;
+    this.insertedItems = value;
   }
 }
 
@@ -38,6 +42,16 @@ const makeSut = (): SutTypes => {
   };
 };
 
+const mockPurchases = (): Array<SavePurchases.Params> => [{
+  id: '1',
+  date: new Date(),
+  value: 1,
+}, {
+  id: '2',
+  date: new Date(),
+  value: 2,
+}];
+
 describe('LocalSavePurchases', () => {
   test('Should not delete cache on sut.init', () => {
     const { cacheStore } = makeSut();
@@ -46,7 +60,7 @@ describe('LocalSavePurchases', () => {
 
   test('Should delete old Cache on sut.save with correct key', async () => {
     const { sut, cacheStore } = makeSut();
-    await sut.save('purchases');
+    await sut.save([]);
     expect(cacheStore.deleteCallsCount).toBe(1);
     expect(cacheStore.deletekey).toBe('purchases');
   });
@@ -55,19 +69,21 @@ describe('LocalSavePurchases', () => {
     const { sut, cacheStore } = makeSut();
 
     jest.spyOn(cacheStore, 'delete').mockImplementationOnce(() => { throw new Error(); });
-    const promise = sut.save('purchases');
+    const promise = sut.save([]);
     expect(cacheStore.deleteCallsCount).toBe(0);
     expect(promise).rejects.toThrow();
   });
 
   test('Should insert if delete succeeds', async () => {
     const { sut, cacheStore } = makeSut();
+    const purchases = mockPurchases();
 
-    sut.save('purchases');
+    sut.save(purchases);
     expect(cacheStore.deleteCallsCount).toBe(1);
     expect(cacheStore.deletekey).toBe('purchases');
 
     expect(cacheStore.insertCallsCount).toBe(1);
     expect(cacheStore.insertKey).toBe('purchases');
+    expect(cacheStore.insertedItems).toEqual(purchases);
   });
 });
