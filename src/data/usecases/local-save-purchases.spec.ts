@@ -22,20 +22,30 @@ class LocalSavePurchases {
   }
 }
 
+type SutTypes = {
+  sut: LocalSavePurchases;
+  cacheStore: CacheStoreSpy;
+};
+
+const makeSut = (): SutTypes => {
+  const cacheStore = new CacheStoreSpy();
+  const sut = new LocalSavePurchases(cacheStore);
+
+  return {
+    sut,
+    cacheStore,
+  };
+};
+
 describe('LocalSavePurchases', () => {
   test('Should not delete cache on sut.init', () => {
-    const cacheStore = new CacheStoreSpy();
-    new LocalSavePurchases(cacheStore);
-
+    const { cacheStore } = makeSut();
     expect(cacheStore.deleteCallsCount).toBe(0);
   });
 
   test('Should delete old Cache on sut.save', () => {
-    const cacheStore = new CacheStoreSpy();
-    const sut = new LocalSavePurchases(cacheStore);
-
+    const { sut, cacheStore } = makeSut();
     sut.save();
-
     expect(cacheStore.deleteCallsCount).toBe(1);
   });
 });
