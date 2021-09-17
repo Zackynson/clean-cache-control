@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
-interface CacheStore {
-  delete: (key: string) => void
-}
+
+import { LocalSavePurchases } from '@/data/usecases';
+import { CacheStore } from '@/data/protocols/cache';
 
 class CacheStoreSpy implements CacheStore {
   deleteCallsCount = 0;
@@ -11,17 +11,6 @@ class CacheStoreSpy implements CacheStore {
   delete(key: string): void {
     this.key = key;
     this.deleteCallsCount += 1;
-  }
-}
-
-class LocalSavePurchases {
-  constructor(private readonly cacheStore: CacheStore) {
-    this.cacheStore = cacheStore;
-  }
-
-  async save(key: string): Promise<void> {
-    this.cacheStore.delete(key);
-    return Promise.resolve();
   }
 }
 
