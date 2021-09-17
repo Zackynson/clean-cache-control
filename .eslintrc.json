@@ -17,6 +17,7 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "no-new":"off"
+        "no-new":"off",
+        "class-methods-use-this":"off"
     }
 }
