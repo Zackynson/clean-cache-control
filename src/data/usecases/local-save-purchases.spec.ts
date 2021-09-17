@@ -46,15 +46,10 @@ describe('LocalSavePurchases', () => {
     expect(cacheStore.deleteCallsCount).toBe(0);
   });
 
-  test('Should delete old Cache on sut.save', () => {
+  test('Should delete old Cache on sut.save with correct key', () => {
     const { sut, cacheStore } = makeSut();
     sut.save('purchases');
     expect(cacheStore.deleteCallsCount).toBe(1);
-  });
-
-  test('should call delete with correct key', () => {
-    const { sut, cacheStore } = makeSut();
-    sut.save('purchases');
     expect(cacheStore.key).toBe('purchases');
   });
 });
