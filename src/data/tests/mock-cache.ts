@@ -14,10 +14,15 @@ export class CacheStoreSpy implements CacheStore {
     this.deletekey = key;
   }
 
-  insert(key: string, value:any): void {
+  insert(key: string, value: any): void {
     this.actions.push(CacheStoreSpy.Action.insert);
     this.insertKey = key;
     this.insertedItems = value;
+  }
+
+  replace(key: string, value: any): void {
+    this.delete(key);
+    this.insert(key, value);
   }
 
   simulateDeleteError(): void {
