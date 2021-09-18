@@ -1,30 +1,43 @@
+/* eslint-disable import/export */
 import { CacheStore } from '@/data/protocols/cache';
 import { SavePurchases } from '@/domain/usecases';
 
 export class CacheStoreSpy implements CacheStore {
-  deleteCallsCount = 0;
-  insertCallsCount = 0;
   deletekey = '';
   insertKey = '';
+  messages: Array<CacheStoreSpy.Message> = [];
 
   insertedItems: Array<SavePurchases.Params> = [];
 
   delete(key: string): void {
+    this.messages.push(CacheStoreSpy.Message.delete);
     this.deletekey = key;
-    this.deleteCallsCount += 1;
   }
 
   insert(key: string, value:any): void {
+    this.messages.push(CacheStoreSpy.Message.insert);
     this.insertKey = key;
-    this.insertCallsCount += 1;
     this.insertedItems = value;
   }
 
   simulateDeleteError(): void {
-    jest.spyOn(CacheStoreSpy.prototype, 'delete').mockImplementationOnce(() => { throw new Error(); });
+    jest.spyOn(CacheStoreSpy.prototype, 'delete').mockImplementationOnce(() => {
+      this.messages.push(CacheStoreSpy.Message.delete);
+
+      throw new Error();
+    });
   }
 
   simulateInsertError(): void {
-    jest.spyOn(CacheStoreSpy.prototype, 'insert').mockImplementationOnce(() => { throw new Error(); });
+    jest.spyOn(CacheStoreSpy.prototype, 'insert').mockImplementationOnce(() => {
+      this.messages.push(CacheStoreSpy.Message.insert);
+      throw new Error();
+    });
+  }
+}
+
+export namespace CacheStoreSpy {
+  export enum Message {
+    insert, delete,
   }
 }

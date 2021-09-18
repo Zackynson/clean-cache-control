@@ -1,4 +1,4 @@
-export interface SavePurchases{
+export interface SavePurchases {
   save: (purchases: Array<SavePurchases.Params>) => Promise<void>;
 }
 
