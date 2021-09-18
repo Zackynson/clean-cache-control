@@ -3,7 +3,7 @@
 import { LocalSavePurchases } from '@/data/usecases';
 import { SavePurchases } from '@/domain/usecases';
 import { CacheStore } from '@/data/protocols/cache';
-import { mockPurchases } from '@/data/tests/mock-purchases';
+import { mockPurchases } from '@/data/tests';
 
 class CacheStoreSpy implements CacheStore {
   deleteCallsCount = 0;
