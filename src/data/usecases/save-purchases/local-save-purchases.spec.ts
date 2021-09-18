@@ -8,9 +8,9 @@ type SutTypes = {
   cacheStore: CacheStoreSpy;
 };
 
-const makeSut = (): SutTypes => {
+const makeSut = (timestamp: Date = new Date()): SutTypes => {
   const cacheStore = new CacheStoreSpy();
-  const sut = new LocalSavePurchases(cacheStore);
+  const sut = new LocalSavePurchases(cacheStore, timestamp);
 
   return {
     sut,
@@ -35,7 +35,8 @@ describe('LocalSavePurchases', () => {
   });
 
   test('Should insert new cache if delete succeeds', async () => {
-    const { sut, cacheStore } = makeSut();
+    const timestamp = new Date();
+    const { sut, cacheStore } = makeSut(timestamp);
     const purchases = mockPurchases();
 
     sut.save(purchases);
@@ -47,7 +48,7 @@ describe('LocalSavePurchases', () => {
 
     expect(cacheStore.deletekey).toBe('purchases');
     expect(cacheStore.insertKey).toBe('purchases');
-    expect(cacheStore.insertedItems).toEqual(purchases);
+    expect(cacheStore.insertedItems).toEqual({ timestamp, value: purchases });
   });
 
   test('Should throw if insert throws', async () => {
