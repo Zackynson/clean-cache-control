@@ -1,8 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
 
 import { LocalSavePurchases } from '@/data/usecases';
-import { SavePurchases } from '@/domain';
+import { SavePurchases } from '@/domain/usecases';
 import { CacheStore } from '@/data/protocols/cache';
+import { mockPurchases } from '@/data/tests/mock-purchases';
 
 class CacheStoreSpy implements CacheStore {
   deleteCallsCount = 0;
@@ -49,16 +50,6 @@ const makeSut = (): SutTypes => {
     cacheStore,
   };
 };
-
-const mockPurchases = (): Array<SavePurchases.Params> => [{
-  id: '1',
-  date: new Date(),
-  value: 1,
-}, {
-  id: '2',
-  date: new Date(),
-  value: 2,
-}];
 
 describe('LocalSavePurchases', () => {
   test('Should not delete cache on sut.init', () => {
