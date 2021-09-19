@@ -5,6 +5,7 @@ import { SavePurchases } from '@/domain/usecases';
 export class CacheStoreSpy implements CacheStore {
   deletekey = '';
   insertKey = '';
+  loadKey = '';
   actions: Array<CacheStoreSpy.Action> = [];
 
   insertedItems: Array<SavePurchases.Params> = [];
@@ -12,6 +13,11 @@ export class CacheStoreSpy implements CacheStore {
   delete(key: string): void {
     this.actions.push(CacheStoreSpy.Action.delete);
     this.deletekey = key;
+  }
+
+  load(key: string): void {
+    this.actions.push(CacheStoreSpy.Action.load);
+    this.loadKey = key;
   }
 
   insert(key: string, value: any): void {
@@ -43,6 +49,6 @@ export class CacheStoreSpy implements CacheStore {
 
 export namespace CacheStoreSpy {
   export enum Action {
-    insert, delete,
+    insert, delete, load,
   }
 }
