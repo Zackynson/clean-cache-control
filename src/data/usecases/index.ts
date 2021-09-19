@@ -1,1 +1,1 @@
-export * from './save-purchases/local-save-purchases';
+export * from './cache-manager/local-cache-manager';
