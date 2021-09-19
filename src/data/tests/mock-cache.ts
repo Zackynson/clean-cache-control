@@ -45,6 +45,13 @@ export class CacheStoreSpy implements CacheStore {
       throw new Error();
     });
   }
+
+  simulateLoadError(): void {
+    jest.spyOn(CacheStoreSpy.prototype, 'load').mockImplementationOnce(() => {
+      this.actions.push(CacheStoreSpy.Action.load);
+      throw new Error();
+    });
+  }
 }
 
 export namespace CacheStoreSpy {
