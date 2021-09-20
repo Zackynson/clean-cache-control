@@ -2,9 +2,9 @@ import { CacheStore } from '@/data/protocols/cache';
 import { SavePurchases, LoadPurchases } from '@/domain/usecases';
 
 export class LocalCacheManager implements SavePurchases, LoadPurchases {
-  constructor(private readonly cacheStore: CacheStore, private readonly timestamp: Date) {
+  constructor(private readonly cacheStore: CacheStore, private readonly currentDate: Date) {
     this.cacheStore = cacheStore;
-    this.timestamp = timestamp;
+    this.currentDate = currentDate;
   }
 
   async load() :Promise<Array<LoadPurchases.Result>> {
@@ -19,7 +19,7 @@ export class LocalCacheManager implements SavePurchases, LoadPurchases {
 
   async save(purchases: Array<SavePurchases.Params>): Promise<void> {
     this.cacheStore.replace('purchases', {
-      timestamp: this.timestamp,
+      timestamp: this.currentDate,
       value: purchases,
     });
   }
