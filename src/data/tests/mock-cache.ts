@@ -9,15 +9,17 @@ export class CacheStoreSpy implements CacheStore {
   actions: Array<CacheStoreSpy.Action> = [];
 
   insertedItems: Array<SavePurchases.Params> = [];
+  fetchResult: any;
 
   delete(key: string): void {
     this.actions.push(CacheStoreSpy.Action.delete);
     this.deletekey = key;
   }
 
-  load(key: string): void {
+  async load(key: string): Promise<any> {
     this.actions.push(CacheStoreSpy.Action.load);
     this.loadKey = key;
+    return this.fetchResult;
   }
 
   insert(key: string, value: any): void {

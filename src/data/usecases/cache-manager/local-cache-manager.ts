@@ -9,8 +9,8 @@ export class LocalCacheManager implements SavePurchases, LoadPurchases {
 
   async load() :Promise<Array<LoadPurchases.Result>> {
     try {
-      this.cacheStore.load('purchases');
-      return [];
+      const cache = await this.cacheStore.load('purchases');
+      return cache.value;
     } catch (error) {
       this.cacheStore.delete('purchases');
       return [];

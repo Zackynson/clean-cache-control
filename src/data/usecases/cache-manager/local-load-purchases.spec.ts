@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 
 import { LocalCacheManager } from '@/data/usecases';
-import { CacheStoreSpy } from '@/data/tests';
+import { CacheStoreSpy, mockPurchases } from '@/data/tests';
 
 type SutTypes = {
   sut: LocalCacheManager;
@@ -24,14 +24,6 @@ describe('LocalLoadPurchases', () => {
     expect(cacheStore.actions).toEqual([]);
   });
 
-  test('Should load cache with correct key', async () => {
-    const { sut, cacheStore } = makeSut();
-    await sut.load();
-
-    expect(cacheStore.actions).toEqual([CacheStoreSpy.Action.load]);
-    expect(cacheStore.loadKey).toBe('purchases');
-  });
-
   test('Should return empty list if load fails', async () => {
     const { sut, cacheStore } = makeSut();
     cacheStore.simulateLoadError();
@@ -39,5 +31,20 @@ describe('LocalLoadPurchases', () => {
     expect(cacheStore.actions).toEqual([CacheStoreSpy.Action.load, CacheStoreSpy.Action.delete]);
     expect(cacheStore.deletekey).toBe('purchases');
     expect(purchases).toEqual([]);
+  });
+
+  test('Should return a list if cache is newer than 3 days', async () => {
+    const timestamp = new Date();
+    const { sut, cacheStore } = makeSut(timestamp);
+    cacheStore.fetchResult = {
+      timestamp,
+      value: mockPurchases(),
+    };
+    const purchases = await sut.load();
+
+    expect(cacheStore.actions).toEqual([CacheStoreSpy.Action.load]);
+    expect(cacheStore.loadKey).toBe('purchases');
+
+    expect(purchases).toEqual(cacheStore.fetchResult.value);
   });
 });
