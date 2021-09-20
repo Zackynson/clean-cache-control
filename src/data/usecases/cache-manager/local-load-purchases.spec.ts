@@ -94,4 +94,20 @@ describe('LocalLoadPurchases', () => {
     expect(cacheStore.deletekey).toBe('purchases');
     expect(purchases).toEqual([]);
   });
+
+  test('Should return an empty list if cache is empty', async () => {
+    const currentDate = new Date();
+
+    const { sut, cacheStore } = makeSut(currentDate);
+    cacheStore.fetchResult = {
+      timestamp: currentDate,
+      value: [],
+    };
+
+    const purchases = await sut.load();
+
+    expect(cacheStore.actions).toEqual([CacheStoreSpy.Action.load]);
+    expect(cacheStore.loadKey).toBe('purchases');
+    expect(purchases).toEqual([]);
+  });
 });
