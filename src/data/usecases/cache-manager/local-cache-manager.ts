@@ -10,7 +10,15 @@ export class LocalCacheManager implements SavePurchases, LoadPurchases {
   async load() :Promise<Array<LoadPurchases.Result>> {
     try {
       const cache = await this.cacheStore.load('purchases');
-      return cache.value;
+      const maxAge = new Date(cache.timestamp);
+
+      maxAge.setDate(maxAge.getDate() + 3);
+
+      if (maxAge > this.currentDate) {
+        return cache.value;
+      }
+
+      throw new Error();
     } catch (error) {
       this.cacheStore.delete('purchases');
       return [];

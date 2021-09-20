@@ -34,17 +34,44 @@ describe('LocalLoadPurchases', () => {
   });
 
   test('Should return a list if cache is newer than 3 days', async () => {
-    const timestamp = new Date();
+    const currentDate = new Date();
+    const timestamp = new Date(currentDate);
+
+    timestamp.setDate(timestamp.getDate() - 3); // 3 days old
+    timestamp.setSeconds(timestamp.getSeconds() + 1); // creation lasting 1 second to 3 days
+
     const { sut, cacheStore } = makeSut(timestamp);
     cacheStore.fetchResult = {
       timestamp,
       value: mockPurchases(),
     };
+
     const purchases = await sut.load();
 
     expect(cacheStore.actions).toEqual([CacheStoreSpy.Action.load]);
     expect(cacheStore.loadKey).toBe('purchases');
 
     expect(purchases).toEqual(cacheStore.fetchResult.value);
+  });
+
+  test('Should return a list if cache is newer than 3 days', async () => {
+    const currentDate = new Date();
+    const timestamp = new Date(currentDate);
+
+    timestamp.setDate(timestamp.getDate() - 3); // 3 days old
+    timestamp.setSeconds(timestamp.getSeconds() - 1); // creation 1 second after 3 days
+
+    const { sut, cacheStore } = makeSut(currentDate);
+    cacheStore.fetchResult = {
+      timestamp,
+      value: mockPurchases(),
+    };
+
+    const purchases = await sut.load();
+
+    expect(cacheStore.actions).toEqual([CacheStoreSpy.Action.load, CacheStoreSpy.Action.delete]);
+    expect(cacheStore.loadKey).toBe('purchases');
+    expect(cacheStore.deletekey).toBe('purchases');
+    expect(purchases).toEqual([]);
   });
 });
